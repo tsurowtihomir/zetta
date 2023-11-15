@@ -22,7 +22,10 @@
           <td>{{ data.favoriteColor }}</td>
           <td>{{ getContactPreferences(data.contactPreferences) }}</td>
           <td>
-            <button @click="deleteRow(index)" class="delete-button">
+            <button
+              @click="showDeleteConfirmation(index)"
+              class="delete-button"
+            >
               Delete
             </button>
           </td>
@@ -32,6 +35,19 @@
   </div>
   <div v-else>
     <p class="no-data-message">No data</p>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div v-if="showConfirmationDialog" class="confirmation-dialog">
+    <div class="confirmation-content">
+      <p>Are you sure you want to delete this row?</p>
+      <div class="confirmation-buttons">
+        <button @click="confirmDelete" class="confirm-button">
+          Yes, Delete
+        </button>
+        <button @click="cancelDelete" class="cancel-button">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <div v-if="exportModalVisible" class="modal" @click="closeExportModal">
@@ -52,6 +68,8 @@ export default {
   data() {
     return {
       exportModalVisible: false,
+      showConfirmationDialog: false,
+      rowToDelete: null,
     };
   },
   methods: {
@@ -68,6 +86,21 @@ export default {
     },
     closeExportModal() {
       this.exportModalVisible = false;
+    },
+    showDeleteConfirmation(index) {
+      this.rowToDelete = index;
+      this.showConfirmationDialog = true;
+    },
+    confirmDelete() {
+      this.$emit("delete-row", this.rowToDelete);
+      this.hideConfirmationDialog();
+    },
+    cancelDelete() {
+      this.hideConfirmationDialog();
+    },
+    hideConfirmationDialog() {
+      this.showConfirmationDialog = false;
+      this.rowToDelete = null;
     },
   },
 };
